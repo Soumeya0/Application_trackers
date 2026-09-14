@@ -58,10 +58,16 @@ def list_applications(session, status=None, sort_by="date_applied", sort_dir="de
     return query.all()
 
 
+def _mark_responded_if_needed(application, new_status):
+    if application.status == "applied" and new_status != "applied" and application.responded_at is None:
+        application.responded_at = date.today()
+
+
 def update_status(session, application_id, new_status):
     application = session.get(Application, application_id)
     if application is None:
         return None
+    _mark_responded_if_needed(application, new_status)
     application.status = new_status
     session.commit()
     session.refresh(application)
@@ -72,6 +78,8 @@ def update_application(session, application_id, **fields):
     application = session.get(Application, application_id)
     if application is None:
         return None
+    if "status" in fields:
+        _mark_responded_if_needed(application, fields["status"])
     for key, value in fields.items():
         setattr(application, key, value)
     session.commit()

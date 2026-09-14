@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Stats{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <h1>Stats</h1>
+        <p class="subtitle">A snapshot of your job search so far.</p>
+    </div>
+
+    {% if stats.total == 0 %}
+        <div class="empty-state">
+            <p>Add a few applications to see stats here.</p>
+            <a class="btn btn-primary" href="{{ url_for('new_application') }}">Add your first application</a>
+        </div>
+    {% else %}
+        <div class="stats-grid">
+            <div class="stat-tile">
+                <span class="stat-value">{{ stats.total }}</span>
+                <span class="stat-label">Total applications</span>
+            </div>
+            <div class="stat-tile">
+                <span class="stat-value">{{ stats.response_rate }}%</span>
+                <span class="stat-label">Response rate</span>
+                <span class="stat-note">moved past "applied"</span>
+            </div>
+            <div class="stat-tile">
+                {% if stats.avg_days_to_response is not none %}
+                    <span class="stat-value">{{ stats.avg_days_to_response }}</span>
+                    <span class="stat-label">Avg. days to first response</span>
+                {% else %}
+                    <span class="stat-value stat-value-muted">—</span>
+                    <span class="stat-label">Avg. days to first response</span>
+                    <span class="stat-note">no responses yet</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <h2 class="section-title">By status</h2>
+        <div class="bar-chart">
+            {% for status in status_choices %}
+                {% set count = stats.by_status.get(status, 0) %}
+                {% set pct = (count / stats.total * 100) if stats.total else 0 %}
+                <div class="bar-row">
+                    <span class="bar-label">{{ status|capitalize }}</span>
+                    <div class="bar-track">
+                        <div class="bar-fill bar-{{ status }}" style="width: {{ pct }}%;"></div>
+                    </div>
+                    <span class="bar-count">{{ count }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

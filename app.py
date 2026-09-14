@@ -5,13 +5,14 @@ from flask import Flask, flash, g, redirect, render_template, request, url_for
 
 from src import crud
 from src.database import SessionLocal, init_db
+from src.stats import compute_stats
 
 STATUS_CHOICES = ["applied", "interviewing", "offer", "rejected", "withdrawn"]
 SOON_THRESHOLD_DAYS = 3
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="Frontend", static_folder="Frontend")
     app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-not-for-production")
     init_db()
 
@@ -43,6 +44,10 @@ def create_app():
             today=date.today(),
             soon_threshold=SOON_THRESHOLD_DAYS,
         )
+
+    @app.route("/stats")
+    def stats():
+        return render_template("stats.html", stats=compute_stats(g.db), status_choices=STATUS_CHOICES)
 
     @app.route("/applications/new", methods=["GET", "POST"])
     def new_application():

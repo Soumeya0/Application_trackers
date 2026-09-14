@@ -58,6 +58,10 @@ a { color: inherit; text-decoration: none; }
     color: var(--text-main);
 }
 
+.header-nav { display: flex; align-items: center; gap: 18px; }
+.nav-link { font-weight: 600; font-size: 0.9rem; color: var(--text-light); }
+.nav-link:hover { color: var(--text-main); }
+
 main.container { padding-top: 36px; padding-bottom: 60px; }
 
 /* ===== Buttons ===== */
@@ -259,8 +263,68 @@ main.container { padding-top: 36px; padding-bottom: 60px; }
     margin-top: 28px;
 }
 
+/* ===== Stats ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-tile {
+    background: var(--card-bg);
+    border: 3px solid var(--text-main);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-value { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 700; }
+.stat-value-muted { color: var(--text-light); }
+.stat-label { font-weight: 600; font-size: 0.9rem; }
+.stat-note { color: var(--text-light); font-size: 0.78rem; }
+
+.section-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+}
+
+.bar-chart {
+    background: var(--card-bg);
+    border: 3px solid var(--text-main);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.bar-row { display: grid; grid-template-columns: 110px 1fr 40px; align-items: center; gap: 12px; }
+.bar-label { font-weight: 600; font-size: 0.88rem; }
+.bar-count { text-align: right; font-weight: 700; font-size: 0.88rem; }
+
+.bar-track {
+    background: var(--bg-color);
+    border: 1px solid var(--clay);
+    border-radius: 20px;
+    height: 16px;
+    overflow: hidden;
+}
+
+.bar-fill { height: 100%; border-radius: 20px; transition: width 0.3s ease; }
+.bar-applied { background: var(--latte); }
+.bar-interviewing { background: var(--clay); }
+.bar-offer { background: var(--mocha); }
+.bar-rejected { background: var(--overdue); }
+.bar-withdrawn { background: #C7C0B8; }
+
 @media (max-width: 640px) {
     .form-grid { grid-template-columns: 1fr; }
     .header-inner { flex-direction: column; gap: 12px; align-items: flex-start; }
     .app-table { font-size: 0.82rem; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 90px 1fr 32px; }
 }

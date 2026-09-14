@@ -90,6 +90,17 @@ def test_status_filter_narrows_results(client):
     assert b"Acme" not in response.data
 
 
+def test_stats_page_reflects_tracked_applications(client):
+    client.post(
+        "/applications/new",
+        data={"company": "Wayne Enterprises", "role": "Platform Engineer", "status": "applied"},
+    )
+    response = client.get("/stats")
+    assert response.status_code == 200
+    assert b"Total applications" in response.data
+    assert b"Response rate" in response.data
+
+
 def test_delete_application_removes_it(client):
     client.post(
         "/applications/new",

@@ -6,13 +6,16 @@
     <title>{% block title %}Application Tracker{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" >
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header class="site-header">
         <div class="container header-inner">
             <a class="logo" href="{{ url_for('index') }}">Application Tracker</a>
-            <a class="btn btn-primary" href="{{ url_for('new_application') }}">+ Add Application</a>
+            <nav class="header-nav">
+                <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+                <a class="btn btn-primary" href="{{ url_for('new_application') }}">+ Add Application</a>
+            </nav>
         </div>
     </header>
 

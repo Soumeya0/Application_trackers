@@ -18,6 +18,8 @@ class Application(Base):
     notes = Column(Text, nullable=True)
     job_link = Column(String, nullable=True)
     tech_tags = Column(String, nullable=True)
+    # Set once, the first time status moves away from "applied" — used for time-to-response stats.
+    responded_at = Column(Date, nullable=True)
 
     def __repr__(self):
         return f"<Application id={self.id} {self.company!r} - {self.role!r} ({self.status})>"

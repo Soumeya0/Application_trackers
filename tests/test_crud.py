@@ -73,6 +73,41 @@ def test_update_status_returns_none_for_missing_application(session):
     assert crud.update_status(session, 999, "offer") is None
 
 
+def test_update_status_sets_responded_at_on_first_response(session):
+    application = crud.add_application(session, company="Acme", role="Backend Engineer")
+    assert application.responded_at is None
+
+    updated = crud.update_status(session, application.id, "interviewing")
+
+    assert updated.responded_at == date.today()
+
+
+def test_update_status_does_not_overwrite_responded_at(session):
+    application = crud.add_application(session, company="Acme", role="Backend Engineer")
+    crud.update_status(session, application.id, "interviewing")
+    first_responded_at = crud.get_application(session, application.id).responded_at
+
+    updated = crud.update_status(session, application.id, "offer")
+
+    assert updated.responded_at == first_responded_at
+
+
+def test_update_application_sets_responded_at_on_status_change(session):
+    application = crud.add_application(session, company="Acme", role="Backend Engineer")
+
+    updated = crud.update_application(session, application.id, status="rejected")
+
+    assert updated.responded_at == date.today()
+
+
+def test_update_application_leaves_responded_at_alone_without_status_change(session):
+    application = crud.add_application(session, company="Acme", role="Backend Engineer")
+
+    updated = crud.update_application(session, application.id, notes="called recruiter")
+
+    assert updated.responded_at is None
+
+
 def test_delete_application_removes_existing_application(session):
     application = crud.add_application(session, company="Acme", role="Backend Engineer")
 

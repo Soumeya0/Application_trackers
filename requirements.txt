@@ -2,3 +2,4 @@ Flask==3.0.3
 SQLAlchemy==2.0.35
 pytest==8.3.3
 schedule==1.2.2
+gunicorn==22.0.0

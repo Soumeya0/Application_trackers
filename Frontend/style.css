@@ -5,7 +5,7 @@
     --sky-deep: #4A7FC4;    /* shade of Cool Horizon */
     --bordeaux: #5B0015;    /* Night Bordeaux */
     --bordeaux-muted: #8C4A54; /* lightened Night Bordeaux */
-    --ivory: #fdedb1;       /* Ivory Mist */
+    --ivory: #f4eac6;       /* Ivory Mist */
     --ivory-card: #FCFAF1;  /* near-white tint of Ivory Mist */
 
     --bg-color: var(--ivory);

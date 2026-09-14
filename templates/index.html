@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Application Tracker{% endblock %}
+
+{% macro sort_link(field, label) -%}
+    {% set next_dir = 'asc' if (sort_by == field and sort_dir == 'desc') else 'desc' %}
+    <a class="th-link" href="{{ url_for('index', status=status_filter, sort=field, dir=next_dir) }}">
+        {{ label }}
+        {% if sort_by == field %}<span class="sort-arrow">{{ '▲' if sort_dir == 'asc' else '▼' }}</span>{% endif %}
+    </a>
+{%- endmacro %}
+
+{% block content %}
+    <div class="page-head">
+        <h1>Your Applications</h1>
+        <p class="subtitle">{{ applications|length }} tracked{% if status_filter %} · filtered by {{ status_filter }}{% endif %}</p>
+    </div>
+
+    <div class="filter-bar">
+        <a class="filter-pill {{ 'active' if not status_filter else '' }}" href="{{ url_for('index', sort=sort_by, dir=sort_dir) }}">All</a>
+        {% for choice in status_choices %}
+            <a class="filter-pill {{ 'active' if status_filter == choice else '' }}"
+               href="{{ url_for('index', status=choice, sort=sort_by, dir=sort_dir) }}">{{ choice|capitalize }}</a>
+        {% endfor %}
+    </div>
+
+    {% if not applications %}
+        <div class="empty-state">
+            <p>No applications {{ 'match this filter' if status_filter else 'yet' }}.</p>
+            <a class="btn btn-primary" href="{{ url_for('new_application') }}">Add your first application</a>
+        </div>
+    {% else %}
+        <div class="table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>{{ sort_link('company', 'Company') }}</th>
+                        <th>{{ sort_link('role', 'Role') }}</th>
+                        <th>{{ sort_link('status', 'Status') }}</th>
+                        <th>{{ sort_link('date_applied', 'Applied') }}</th>
+                        <th>{{ sort_link('deadline', 'Deadline') }}</th>
+                        <th>{{ sort_link('follow_up_date', 'Follow-up') }}</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in applications %}
+                        {% set deadline_days = (application.deadline - today).days if application.deadline else none %}
+                        {% set follow_up_days = (application.follow_up_date - today).days if application.follow_up_date else none %}
+                        {% set is_urgent = (deadline_days is not none and deadline_days <= soon_threshold) or (follow_up_days is not none and follow_up_days <= soon_threshold) %}
+                        <tr class="{{ 'row-urgent' if is_urgent else '' }}">
+                            <td>
+                                <div class="company-cell">
+                                    <span class="company-name">{{ application.company }}</span>
+                                    {% if application.job_link %}
+                                        <a class="job-link" href="{{ application.job_link }}" target="_blank" rel="noopener">listing ↗</a>
+                                    {% endif %}
+                                </div>
+                                {% if application.tech_tags %}
+                                    <div class="tag-row">
+                                        {% for tag in application.tech_tags.split(',') %}
+                                            <span class="tech-tag">{{ tag.strip() }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ application.role }}</td>
+                            <td><span class="status-badge status-{{ application.status }}">{{ application.status }}</span></td>
+                            <td>{{ application.date_applied.strftime('%b %-d, %Y') if application.date_applied else '—' }}</td>
+                            <td>
+                                {% if application.deadline %}
+                                    {{ application.deadline.strftime('%b %-d, %Y') }}
+                                    {% if deadline_days is not none and deadline_days < 0 %}
+                                        <span class="due-badge due-overdue">overdue</span>
+                                    {% elif deadline_days is not none and deadline_days <= soon_threshold %}
+                                        <span class="due-badge due-soon">soon</span>
+                                    {% endif %}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if application.follow_up_date %}
+                                    {{ application.follow_up_date.strftime('%b %-d, %Y') }}
+                                    {% if follow_up_days is not none and follow_up_days < 0 %}
+                                        <span class="due-badge due-overdue">overdue</span>
+                                    {% elif follow_up_days is not none and follow_up_days <= soon_threshold %}
+                                        <span class="due-badge due-soon">soon</span>
+                                    {% endif %}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td class="actions-col">
+                                <a class="btn btn-small" href="{{ url_for('edit_application', application_id=application.id) }}">Edit</a>
+                                <form class="inline-form" method="post" action="{{ url_for('delete_application', application_id=application.id) }}"
+                                      onsubmit="return confirm('Delete the {{ application.company }} application?');">
+                                    <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

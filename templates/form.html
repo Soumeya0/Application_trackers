@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit Application' if mode == 'edit' else 'Add Application' }}{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <h1>{{ 'Edit Application' if mode == 'edit' else 'Add Application' }}</h1>
+    </div>
+
+    <form class="app-form" method="post"
+          action="{{ url_for('edit_application', application_id=application_id) if mode == 'edit' else url_for('new_application') }}">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="company">Company *</label>
+                <input id="company" name="company" type="text" required value="{{ application.company if application else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role *</label>
+                <input id="role" name="role" type="text" required value="{{ application.role if application else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    {% for choice in status_choices %}
+                        <option value="{{ choice }}" {{ 'selected' if application and application.status == choice else '' }}>{{ choice|capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="date_applied">Date applied</label>
+                <input id="date_applied" name="date_applied" type="date"
+                       value="{{ application.date_applied.strftime('%Y-%m-%d') if application and application.date_applied else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="deadline">Deadline</label>
+                <input id="deadline" name="deadline" type="date"
+                       value="{{ application.deadline.strftime('%Y-%m-%d') if application and application.deadline else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="follow_up_date">Follow-up date</label>
+                <input id="follow_up_date" name="follow_up_date" type="date"
+                       value="{{ application.follow_up_date.strftime('%Y-%m-%d') if application and application.follow_up_date else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="job_link">Job link</label>
+                <input id="job_link" name="job_link" type="url" placeholder="https://..."
+                       value="{{ (application.job_link or '') if application else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="tech_tags">Tech tags</label>
+                <input id="tech_tags" name="tech_tags" type="text" placeholder="python, flask, sql"
+                       value="{{ (application.tech_tags or '') if application else '' }}">
+            </div>
+
+            <div class="form-group form-group-wide">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" rows="4">{{ (application.notes or '') if application else '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a class="btn btn-secondary" href="{{ url_for('index') }}">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Application' }}</button>
+        </div>
+    </form>
+{% endblock %}

@@ -2,6 +2,15 @@ from datetime import date
 
 from .models import Application
 
+SORTABLE_FIELDS = {
+    "company",
+    "role",
+    "date_applied",
+    "status",
+    "deadline",
+    "follow_up_date",
+}
+
 
 def add_application(
     session,
@@ -36,11 +45,17 @@ def get_application(session, application_id):
     return session.get(Application, application_id)
 
 
-def list_applications(session, status=None):
+def list_applications(session, status=None, sort_by="date_applied", sort_dir="desc"):
     query = session.query(Application)
     if status is not None:
         query = query.filter(Application.status == status)
-    return query.order_by(Application.date_applied.desc()).all()
+
+    if sort_by not in SORTABLE_FIELDS:
+        sort_by = "date_applied"
+    column = getattr(Application, sort_by)
+    query = query.order_by(column.asc() if sort_dir == "asc" else column.desc())
+
+    return query.all()
 
 
 def update_status(session, application_id, new_status):
@@ -48,6 +63,17 @@ def update_status(session, application_id, new_status):
     if application is None:
         return None
     application.status = new_status
+    session.commit()
+    session.refresh(application)
+    return application
+
+
+def update_application(session, application_id, **fields):
+    application = session.get(Application, application_id)
+    if application is None:
+        return None
+    for key, value in fields.items():
+        setattr(application, key, value)
     session.commit()
     session.refresh(application)
     return application
